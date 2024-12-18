@@ -4,8 +4,6 @@
 //stores depsMap for each target object property
 const targetMap = new WeakMap();
 
-let total;
-
 //retuns a proxy object that we can use to intercept get + set
 //and run effects when the target is accessed
 export function reactive(target, effect) {
