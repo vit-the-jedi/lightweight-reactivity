@@ -5,45 +5,9 @@
     <title>My Web Page</title>
   </head>
   <body>
-    <h1>Hello, world!</h1>
-    <p id="total"></p>
-    <a href="javascript:void(0)" data-action="Open Modal" data-modal-category="privacy-terms">Open Privacy Terms</a>
-    <p id="modalContent"></p>
-    <a href="javascript:void(0)" data-action="Open Modal" data-modal-category="partners">Open Partners</a>
+    <p id="output">Start</p>
+    <p id="output2">Start</p>
     <script src="./index.js" type="module"></script>
-    <script type="module">
-      import { reactive } from "./index.js";
-      //create an effect that will update our total
-      const modal = reactive({
-        open: false,
-        clickAction: "Close X",
-        content: "Hello, world!",
-        effects() {
-          return {
-            open: {
-              toggleVisibility: () => {
-                document.querySelector("#total").textContent = this.open ? "Open" : "Closed";
-              },
-              toggleHello: () => {
-                console.log(this.open ? "Hello" : "Goodbye");
-              },
-            },
-            content: {
-              updateContent: () => {
-                document.querySelector("#modalContent").textContent = this.content;
-              },
-            },
-          };
-        },
-      });
-      //small caveat - with current system we NEED to invoke a get() before doing aything else
-      //otherwise we don't track deps
-      document.querySelector("*[data-action]").addEventListener("click", () => {
-        modal.open = !modal.open;
-        modal.content = modal.content += Math.random();
-      });
-
-      console.log(modal);
-    </script>
+    <script type="module" src="test.js"></script>
   </body>
 </html>
