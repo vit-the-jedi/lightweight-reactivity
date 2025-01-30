@@ -6,18 +6,24 @@ const targetMap = new WeakMap();
 
 //retuns a proxy object that we can use to intercept get + set
 //and run effects when the target is accessed
-export function reactive(target, effect) {
+export function reactive(target) {
+  //effects() returns an object of methods based on property changes
+  //object keys prefixed by "__" are considered private and will be ignored
+  let effects = target.__effects;
+  const keys = Object.keys(target)
+    .map((key) => key)
+    .filter((key) => !key.includes("__"));
+  keys.forEach((key) => track(target, key, effects));
   const handler = {
     get(target, key, reciever) {
       let result = Reflect.get(target, key, reciever);
-      track(target, key);
       return result;
     },
     set(target, key, value, reciever) {
       let oldValue = target[key];
       let result = Reflect.set(target, key, value, reciever);
       if (result && oldValue !== value) {
-        trigger(target, key);
+        trigger(target, key, reciever);
       }
       return result;
     },
@@ -30,7 +36,7 @@ export function reactive(target, effect) {
 let dep = new Set();
 
 //save each effect to re-run later inside of our depsMap
-function track(target, key) {
+function track(target, key, effects) {
   let depsMap = targetMap.get(target);
 
   if (!depsMap) {
@@ -42,21 +48,14 @@ function track(target, key) {
     //Set() wasn't working as each effect was being added multiple times (treated as a unique obj every time)
     depsMap.set(key, (dep = new Map()));
   }
-  if (target.effects) {
-    //effects() returns an object of methods based on property changes
-    const effects = Object.entries(target.effects());
-    effects.forEach((effect) => {
-      //only get the effects that match the property that was changed
-      if (effect[0] === key) {
-        //save each matching effect to the dep map, organized by property being changed
-        dep.set(key, effect[1]);
-      }
-    });
+  if (effects) {
+    const effectFns = Object.values(effects[key]).map((fn) => fn);
+    dep.set(key, effectFns);
   }
 }
 
 //run each effect when target object is accessed
-function trigger(target, key) {
+function trigger(target, key, recieverProxy) {
   const depsMap = targetMap.get(target);
   if (!depsMap) {
     return;
@@ -66,23 +65,12 @@ function trigger(target, key) {
     //run each effect that was saved to the dep map, based on the property that was changed
     dep.forEach((effectName) => {
       //run each effect function
-      Object.values(effectName).forEach((effectFn) => {
-        effectFn();
+      effectName.forEach((fn) => {
+        //bind the recieverProxy to the effect function so that we can access the target object
+        //this makes the effect function also able to make reactive updates
+        fn = fn.bind(recieverProxy);
+        fn();
       });
     });
   }
 }
-
-// let effect = () => {
-//   total = product.price * product.quantity;
-//   console.log(total);
-// };
-
-//pass each new object through the reactive function to
-// return a proxy with our get and set handlers
-// let product = reactive({
-//   price: 5,
-//   quantity: 2,
-// });
-
-// product.price = 20;
