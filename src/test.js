@@ -5,24 +5,33 @@ class testClass {
     this.test = "test";
     this.__private = "private";
     this.test2 = "test2";
-  }
-  effects() {
-    return {
+    this.show = true;
+    this.__effects = {
       test: {
-        updateValue1: () => {
+        updateValue1() {
           document.getElementById("output").innerText = this.test;
           this.test2 = "newValue";
           console.log(`test value updated to`, this.test);
         },
-        hello: () => {
+        hello() {
           console.log("heyyyy");
         },
       },
       test2: {
-        updateValue: () => {
+        updateValue() {
           document.getElementById("output2").innerText = this.test2;
           console.log(`test2 value updated to`, this.test2);
           this.test = "newValueFORSUREEE";
+        },
+      },
+      show: {
+        toggle() {
+          if (this.show) {
+            document.querySelector(".show").style.display = "block";
+          } else {
+            document.querySelector(".show").style.display = "none";
+          }
+          console.log(`show value updated to`, this.show);
         },
       },
     };
@@ -30,8 +39,3 @@ class testClass {
 }
 
 const test = reactive(new testClass());
-
-setTimeout(() => {
-  test.test = "hello";
-  test.test2 = "world";
-}, 1000);
