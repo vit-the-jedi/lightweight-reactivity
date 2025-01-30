@@ -1,4 +1,4 @@
-import { reactive } from "./index.js";
+import { reactive } from "https://raw.githubusercontent.com/vit-the-jedi/lightweight-reactivity/main/src/index.js";
 
 class testClass {
   constructor() {

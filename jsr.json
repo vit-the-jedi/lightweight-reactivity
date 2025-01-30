@@ -1,0 +1,6 @@
+{
+  "name": "@vit-the-jedi-tools/lightweight-reactivity",
+  "version": "0.1.0",
+  "license": "MIT",
+  "exports": "./src/index.js"
+}
