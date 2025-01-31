@@ -10,10 +10,26 @@ export function reactive(target) {
   //effects() returns an object of methods based on property changes
   //object keys prefixed by "__" are considered private and will be ignored
   let effects = target.__effects;
-  const keys = Object.keys(target)
-    .map((key) => key)
-    .filter((key) => !key.includes("__"));
-  keys.forEach((key) => track(target, key, effects));
+  //ignore keys that are functions, constructors, or private
+  //use getPrototypeOf to get the keys of the target object, if any
+  const keys = [
+    ...Object.keys(Object.getPrototypeOf(target)),
+    ...Object.keys(target),
+  ];
+  keys
+    .filter(
+      (key) =>
+        typeof target[key] !== "function" &&
+        key !== "constructor" &&
+        !key.includes("__")
+    )
+    .map((key) => key);
+  //only track keys that have effects
+  keys.forEach((key) => {
+    if (target[key] && target.__effects[key]) {
+      track(target, key, effects);
+    }
+  });
   const handler = {
     get(target, key, reciever) {
       let result = Reflect.get(target, key, reciever);
