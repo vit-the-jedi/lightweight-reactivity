@@ -26,7 +26,7 @@ export function reactive(target) {
     .map((key) => key);
   //only track keys that have effects
   keys.forEach((key) => {
-    if (target[key] && target.__effects[key]) {
+    if (target.__effects.hasOwnProperty(key)) {
       track(target, key, effects);
     }
   });
