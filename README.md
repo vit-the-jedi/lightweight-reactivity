@@ -10,6 +10,7 @@ This project uses the basis for Vue 3's reactivity system, and implements a simp
 
 ## Installation
 No external dependencies are required. Simply include the `reactive.js` file in your project and import the `reactive` function.
+Alternatively, you can import this project from [jsr.io](https://jsr.io/@vit-the-jedi-tools/lightweight-reactivity)
 
 ## Usage
 ```javascript
